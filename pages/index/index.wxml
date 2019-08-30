@@ -38,27 +38,33 @@
         </view>
       </navigator>
     </view> -->
-    <view wx:if="{{noticeList}}" class="notice">
-      <image class="notice_icon" src="/images/notice.png"></image>
-      <swiper wx:if="{{noticeList}}" class="notice_swiper" vertical="true" autoplay="true" circular="true" interval="3000">
-        <navigator wx:for-items="{{noticeList.dataList}}" wx:key="id" url="/pages/notice/show?id={{item.id}}" open-type="navigate">
-          <swiper-item>
-            <view class="notice_itemr">{{item.title}}</view>
-          </swiper-item>
-        </navigator>
-      </swiper>
-    </view>
-    <scroll-view scroll-x>
-      <view class="category-box" style='width:{{category_box_width}}rpx;'>
-        <view class="category-list" wx:for="{{categories}}" wx:key="*this">
-          <view class="category-column {{activeCategoryId == item.id ? 'type-item-on' : ''}}" bindtap="tabClick" id="{{item.id}}">
-            <image class="category-imgbox" src="{{item.icon}}"></image>
-            <view class="category-title">{{item.name}}</view>
-          </view>          
+  </view>
+
+
+
+
+
+  <view class="goods-container" hidden="{{!inputVal}}">
+    <view class="goods-box" wx:for-items="{{goods}}" wx:key="{{index}}" data-id="{{item.id}}">
+      <view bindtap="toDetailsTap" data-id="{{item.id}}" class="img-box">
+        <image src="{{item.pic}}_m" class="image" mode="aspectFit" lazy-load="true" />
+      </view>
+      <view bindtap="toDetailsTap" data-id="{{item.id}}" class="goods-title">{{item.videoId}}</view>
+      <view style='display:flex;'>
+        <view bindtap="toDetailsTap" data-id="{{item.id}}" class="goods-price">¥ {{item.minPrice}}</view>
+        <view bindtap="toDetailsTap" data-id="{{item.id}}" wx:if="{{item.originalPrice && item.originalPrice > 0}}" class="goods-price" style='color:#aaa;text-decoration:line-through'>¥ {{item.originalPrice}}</view>
+        <view bindtap="getGoodsDetailAndKanjieInfo" data-id="{{item.id}}" style='position:absolute;right:20rpx'>
+          <image style='height:40rpx;width:40rpx;padding-top:24rpx;' src="../../image/add.png"/>
         </view>
       </view>
-    </scroll-view>
+    </view>
   </view>
+
+
+
+
+
+
   <view class="swiper-container">
     <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
       <block wx:for="{{banners}}" wx:key="id">
@@ -77,24 +83,30 @@
     <view class="weui-loadmore__tips weui-loadmore__tips_in-line">爆品推荐</view>
   </view>
   <view class="goods-container" wx:if="{{goodsRecommend.length > 0 && activeCategoryId == 0}}">
-    <view class="goods-box" wx:for-items="{{goodsRecommend}}" wx:key="*this" bindtap="toDetailsTap" data-id="{{item.id}}">
-      <view class="img-box">
-        <image src="{{item.pic}}_m" class="image" mode="aspectFill" lazy-load="true" />
+    <view class="goods-box" wx:for-items="{{goodsRecommend}}" wx:key="*this">
+      <view bindtap="toDetailsTap" data-id="{{item.id}}" class="img-box">
+        <image src="{{item.pic}}_m" class="image" mode="aspectFit" lazy-load="true" />
+        <image wx:if="{{item.stores<1}}" src="../../images/out-of-stock.en.png" class="outofstock" />
       </view>
-      <view class="goods-title">{{item.name}}</view>
+      <view bindtap="toDetailsTap" data-id="{{item.id}}" class="goods-title">{{item.videoId}}</view>
       <view style='display:flex;'>
-        <view class="goods-price">¥ {{item.minPrice}}</view>
-        <view wx:if="{{item.originalPrice && item.originalPrice > 0}}" class="goods-price" style='color:#aaa;text-decoration:line-through'>¥ {{item.originalPrice}}</view>
+        <view bindtap="toDetailsTap" data-id="{{item.id}}" class="goods-price">¥ {{item.minPrice}}</view>
+        <view bindtap="toDetailsTap" data-id="{{item.id}}" wx:if="{{item.originalPrice && item.originalPrice > 0}}" class="goods-price" style='color:#aaa;text-decoration:line-through'>¥ {{item.originalPrice}}</view>
+        <view bindtap="getGoodsDetailAndKanjieInfo" data-id="{{item.id}}" style='position:absolute;right:20rpx'>
+          <image style='height:40rpx;width:40rpx;padding-top:24rpx;' src="../../image/add.png"/>
+        </view>
       </view>
     </view>
   </view>
-  <ad unit-id="adunit-588264b3e2362e1e"></ad>
   <view wx-if="{{kanjiaList.length > 0 && activeCategoryId == 0}}" class="weui-panel weui-panel_access" style='margin-top:0px;'>
-    <view class="weui-panel__hd">疯狂砍价</view>
+    <view class='space'></view>
+    <view class="weui-loadmore weui-loadmore_line">
+      <view class="weui-loadmore__tips weui-loadmore__tips_in-line">疯狂砍价</view>
+    </view>
     <view class="weui-panel__bd">
       <view wx:for-items="{{kanjiaList}}" wx:key="*this" class="weui-media-box weui-media-box_appmsg">
         <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-          <image class="weui-media-box__thumb" src="{{kanjiaGoodsMap[item.goodsId].pic}}_m" />
+          <image mode="aspectFit" class="weui-media-box__thumb" src="{{kanjiaGoodsMap[item.goodsId].pic}}_m" />
         </view>
         <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
           <view class="weui-media-box__title">{{kanjiaGoodsMap[item.goodsId].name}}</view>
@@ -118,9 +130,9 @@
     <view class='tuan'>
       <view class='tuan-item' wx:for-items="{{pingtuanList}}" wx:key="*this">
         <view class='tuan-goods-pic'>
-          <image src="{{item.pic}}" mode="aspectFill" lazy-load='{{true}}' />
+          <image src="{{item.pic}}" mode="widthFix" lazy-load="true" />
         </view>
-        <view class='tuan-title'>{{item.name}}</view>
+        <view class='tuan-title'>{{item.videoId}}</view>
         <view class='tuan-profile'>{{item.characteristic}}</view>
         <view class="weui-badge" style="margin-left: 20rpx;" wx:if="{{item.tags}}">{{item.tags}}</view>
         <view class='tuan-price'>
@@ -135,23 +147,88 @@
   </block>
 
   <view class='space'></view>
-  <view class="weui-loadmore weui-loadmore_line">
-    <view class="weui-loadmore__tips weui-loadmore__tips_in-line">商品列表</view>
-  </view>
-  <view class="goods-container">
-    <view class="goods-box" wx:for-items="{{goods}}" wx:key="{{index}}" bindtap="toDetailsTap" data-id="{{item.id}}">
-      <view class="img-box">
-        <image src="{{item.pic}}_m" class="image" mode="aspectFill" lazy-load="true" />
+
+
+  <block wx:for="{{goodsWrap}}" wx:key="id">
+    <view wx:if="{{item.pic}}" class="swiper-container">
+      <swiper class="swiper_box" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" bindchange="swiperchange">
+          <swiper-item>
+            <image bindtap="tapBanner" data-id="{{item.businessId}}" src="{{item.pic}}_m" class="slide-image" width="750rpx" height="562.5rpx" />
+          </swiper-item>
+      </swiper>
+      <view class="dots">
+        <block wx:for="{{banners}}" wx:key="unique">
+          <view class="dot{{index == swiperCurrent ? ' active' : ''}}"></view>
+        </block>
       </view>
-      <view class="goods-title">{{item.name}}</view>
-      <view style='display:flex;'>
-        <view class="goods-price">¥ {{item.minPrice}}</view>
-        <view wx:if="{{item.originalPrice && item.originalPrice > 0}}" class="goods-price" style='color:#aaa;text-decoration:line-through'>¥ {{item.originalPrice}}</view>
+    </view>
+
+    <view wx:if="{{item.goods.length > 0}}" class="weui-loadmore weui-loadmore_line" style='margin-top:55rpx;margin-bottom:5rpx'  >
+      <view id='{{item.scrollId}}' class="weui-loadmore__tips weui-loadmore__tips_in-line">{{item.chinesename}}</view>
+    </view>
+    <view class="goods-container">
+      <view class="goods-box" wx:for-items="{{item.goods}}" wx:for-item="goods" wx:key="{{index}}" >
+        <view class="img-box" bindtap="toDetailsTap" data-id="{{goods.id}}">
+          <image src="{{goods.pic}}_m" class="image" mode="aspectFit" lazy-load="true" />
+          <image wx:if="{{goods.stores<1}}" src="../../images/out-of-stock.en.png" class="outofstock" mode="aspectFit" />
+        </view>
+        <view class="goods-title" bindtap="toDetailsTap" data-id="{{goods.id}}">{{goods.characteristic}}</view>
+        <view class="goods-title5" bindtap="toDetailsTap" data-id="{{goods.id}}">{{goods.videoId}}</view>
+
+        <view style='display:flex;'>
+          <view class="goods-price" bindtap="toDetailsTap" data-id="{{goods.id}}">¥ {{goods.minPrice}}</view>
+          <view wx:if="{{goods.originalPrice && goods.originalPrice > 0}}" bindtap="toDetailsTap" data-id="{{goods.id}}" class="goods-price" style='color:#aaa;text-decoration:line-through'>¥ {{goods.originalPrice}}</view>
+          <view bindtap="getGoodsDetailAndKanjieInfo" data-id="{{goods.id}}"style='position:absolute;right:20rpx'>
+            <image style='height:40rpx;width:40rpx;padding-top:24rpx;' src="../../image/add.png"/>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+  <view hidden="{{loadingMoreHidden ? true : false}}" class="no-more-goods">没有更多啦</view>
+
+
+
+  <view class="show-popup" hidden="{{hideShopPopup}}" catchtouchmove="true">
+    <view class="popup-mask" bindtap="closePopupTap"></view>
+    <view class="popup-contents">
+      <view class="pop-goods-info">
+        <view class="pop-img-box">
+          <image src="{{goodsDetail.basicInfo.pic}}" class="goods-thumbnail" />
+        </view>
+        <view class="pop-goods-des">
+          <view class="pop-goods-title">{{goodsDetail.basicInfo.name}}</view>
+          <view class="pop-goods-price">¥ {{selectSizePrice}}</view>
+        </view>
+        <view class="pop-goods-close" bindtap="closePopupTap"></view>
+      </view>
+      <view class="size-label-box">
+        <block wx:for="{{goodsDetail.properties}}" wx:for-item="property" wx:for-index="idx" wx:key="id">
+          <view class="label">{{property.name}}</view>
+          <view class="label-item-box">
+            <view class="label-item {{item.active ? 'active' : '' }}" wx:for="{{property.childsCurGoods}}" wx:key="id" bindtap="labelItemTap" data-propertyindex="{{idx}}" data-propertyid="{{property.id}}" data-propertyname="{{property.name}}" data-propertychildindex="{{index}}"
+              data-propertychildid="{{item.id}}" data-propertychildname="{{item.name}}">
+              {{item.name}}
+            </view>
+          </view>
+        </block>
+      </view>
+      <view class="buy-num-box">
+        <view class="num-label">购买数量</view>
+        <view class="num-box">
+          <view class="num-jian {{buyNumber == buyNumMin ? 'hui': ''}}" bindtap="numJianTap">-</view>
+          <view class="num-input">
+            <input type="number" value="{{buyNumber}}" disabled/>
+          </view>
+          <view class="num-jia {{buyNumber== buyNumMax ? 'hui': ''}}" bindtap="numJiaTap">+</view>
+        </view>
+      </view>
+      <view class="popup-join-btn" wx:if="{{shopType =='addShopCar'}}" bindtap="addShopCar">
+        加入购物车
+      </view>
+      <view class="popup-join-btn" data-shopType="{{shopType}}" wx:if="{{shopType =='tobuy' || shopType =='toPingtuan'}}" bindtap="buyNow">
+        立即购买
       </view>
     </view>
   </view>
-  <view hidden="{{loadingMoreHidden ? true : false}}" class="no-more-goods">没有更多啦</view>
-</view>
-<view class='coupons-float' bindtap="goCoupons">
-  <image src="/images/gift.png"></image>
 </view>
